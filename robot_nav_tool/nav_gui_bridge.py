@@ -5,7 +5,7 @@ from rclpy.time import Time
 from geometry_msgs.msg import PoseStamped,PoseWithCovarianceStamped, Vector3, Twist
 from rclpy.duration import Duration
 from std_msgs.msg import String, Int8
-from rclpy.qos import qos_profile_sensor_data
+from rclpy.qos import qos_profile_sensor_data, qos_profile_system_default
 #from .robot_navigator import Mission
 from .robot_nav_operator import Mission
 
@@ -17,10 +17,11 @@ class NavGUIBridge(Node):
     def __init__(self):
         super().__init__('nav_gui_bridge')
 
-        self.command_sub = self.create_subscription(Vector3, 'nav_p2p/setpoint', self.nsetpoint_callback, 10)
+        self.command_sub = self.create_subscription(Vector3, 'nav_p2p/setpoint', self.nsetpoint_callback, qos_profile_system_default)
         self.go_sub = self.create_subscription(Int8, 'nav_p2p/go', self.ngo_callback, 10)
         self.named_sub = self.create_subscription(String, 'nav_p2p/named_target', self.nnamed_callback, 10)
-        self.setpoint_pub = self.create_publisher(Vector3, 'nav_p2p/setpoint',10)
+        
+        self.setpoint_pub = self.create_publisher(Vector3, 'nav_p2p/setpoint',qos_profile_system_default)
         self.twist_sub = self.create_subscription(Twist, 'cmd_vel', self.vel_callback, 10)
         self.workstatus_pub = self.create_publisher(String, 'robot_status/working',10)
 
@@ -30,7 +31,7 @@ class NavGUIBridge(Node):
         self.navp2p_data = [0.0,0.0,0.0]
         self.named_target = "home"
 
-        self.node_config_path = "/home/sunday/ros2_ws/src/robot_nav_tool/json/named_point.json"
+        self.node_config_path = "/home/neptune/ros2_ws/src/robot_nav_tool/json/named_point.json"
         self.node_config = {}
         self.goal_point = Vector3()
 
